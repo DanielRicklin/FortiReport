@@ -55,14 +55,3 @@ class FortiGateApi():
         self.get_api_request(FortiGateApi.ENDPOINT_FIREWALL_IPPOOL)
         self.get_api_request(FortiGateApi.ENDPOINT_FIREWALL_POLICY)
         file.export_xlsx_file(self.configuration)
-
-
-# proxy_local_port = input("Un port proxy (si non presse entrer): ")
-# ip = input("IP : ")
-# api_key = input("clé d'API : ")
-# if proxy_local_port:
-#     forti = FortiGateApi(ip=ip, api_key=api_key, proxy_local_port=proxy_local_port)
-# else:
-#     forti = FortiGateApi(ip=ip, api_key=api_key)
-# forti = FortiGateApi(ip="10.48.124.36", api_key="8frtpzxmp91rjmxGdccwtrysxkyc9j", proxy_local_port=7080)
-# forti.get_xlsx_file()
