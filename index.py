@@ -5,8 +5,11 @@ import logging
 from src.FortigateApi import FortiGateApi
 from src.FortigateSSH import FortigateSSH
 
-logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s')
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s')
 logging.getLogger().setLevel(logging.INFO)
+
+# def list_of_config(arg):
+#     return arg.split(',')
 
 parser = argparse.ArgumentParser(description="Make nice Excel Fortigate Report")
 parser.add_argument('--ip', required=True, help="set the IP you want to access")
@@ -16,6 +19,8 @@ parser.add_argument('--bastion', action="store_true", help="Only for SSH if you 
 parser.add_argument('--api', action="store_true", help="if you want to request your Fortigate through the API")
 parser.add_argument('--api-key', help="set the API KEY")
 parser.add_argument('--proxy-port', help="set the proxy port is you need to access you Fortigate through a proxy")
+parser.add_argument('--override-filename', help="set the name you want")
+# parser.add_argument('--config-list', help="set the list of configs you want in you report", type=list_of_config)
 parser.add_argument('--verbose', action="store_true", help="Verbose logging mode, will log all actions")
 args = parser.parse_args()
 
@@ -35,7 +40,7 @@ elif args.api is None and args.ssh is None:
 if args.args_mode:
     if args.api:
         logging.info("Running program through API")
-        forti = FortiGateApi(ip=args.ip, api_key=args.api_key, proxy_local_port=args.proxy_port)
+        forti = FortiGateApi(ip=args.ip, api_key=args.api_key, proxy_local_port=args.proxy_port, filename=args.override_filename)
         forti.get_xlsx_file()
 else:
     ip = input("IP : ")
@@ -61,7 +66,8 @@ else:
     elif args.api:
         api_key = input("Clé d'API : ")
         proxy_port = input("Port proxy : ")
-        forti = FortiGateApi(ip=ip, api_key=api_key, proxy_local_port=proxy_port)
+        filename = input("Override filename : ")
+        forti = FortiGateApi(ip=ip, api_key=api_key, proxy_local_port=proxy_port, filename=filename)
         forti.get_xlsx_file()
     else:
         print("Il faut ajouter l'option --ssh ou --api pour avancer")

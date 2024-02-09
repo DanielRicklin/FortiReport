@@ -13,7 +13,7 @@ class FortigateToXlsx():
     SUBTITLE_FORMAT = {'bold': 1, 'border': 1, 'align': 'center', 'valign': 'vcenter', 'fg_color': '#C0C0C0', 'font_color': 'black'}
 
     def __init__(self) -> None:
-        self.workbook = xlsxwriter.Workbook('Matrice_FLUX.xlsx')
+        self.workbook = xlsxwriter.Workbook('Report_FORTIGATE.xlsx')
         self.lign = 3
         self.column = 2
         self.vdom_name = ""

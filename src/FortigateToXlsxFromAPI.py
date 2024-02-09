@@ -1,9 +1,15 @@
 import ipaddress
 from .FortigateToXlsx import FortigateToXlsx
+import xlsxwriter
 
 
 class FortigateToXlsxFromAPI(FortigateToXlsx):
     """Here is created and exported the xlsx file with your configuration"""
+
+    def __init__(self, filename) -> None:
+        super().__init__()
+        if filename:
+            self.workbook = xlsxwriter.Workbook(f'Report_{filename}.xlsx')
 
     def get_security_profile_format(self, sp: str):
         colors = {'WEB': "#189fba", 'AV': "#ff4d00", 'SSL': "#be9e6f", 'APP': "#009848", 'IPS': "#aeb948"}
