@@ -3,11 +3,22 @@
 from netmiko import ConnectHandler, redispatch
 import time
 import re
+
 # from netmiko.fortinet import FortinetSSH
 
 
-class FortigateSSH():
-    def __init__(self, ip: str = "", port: int = 22, user: str = "admin", password: str = "", bastion_ip: str = "", bastion_user: str = "admin", bastion_password: str = "", bastion_port: int = 22) -> None:
+class FortigateSSH:
+    def __init__(
+        self,
+        ip: str = "",
+        port: int = 22,
+        user: str = "admin",
+        password: str = "",
+        bastion_ip: str = "",
+        bastion_user: str = "admin",
+        bastion_password: str = "",
+        bastion_port: int = 22,
+    ) -> None:
         self.vdom = []
         # ENDPOINT_FIREWALL_VDOM = ["/system/vdom", "vdom"]
         # ENDPOINT_FIREWALL_INTERFACE = ["/system/interface", "interface"]
@@ -20,20 +31,20 @@ class FortigateSSH():
         # ENDPOINT_FIREWALL_IPPOOL = ["/firewall/ippool", "ippool"]
         # ENDPOINT_FIREWALL_POLICY = ["/firewall/policy", "policy"]
         bastion = {
-            'device_type': 'terminal_server',
-            'ip': bastion_ip,
-            'username': bastion_user,
-            'password': bastion_password,
-            'port': bastion_port,
-            'session_log': './output.log'
+            "device_type": "terminal_server",
+            "ip": bastion_ip,
+            "username": bastion_user,
+            "password": bastion_password,
+            "port": bastion_port,
+            "session_log": "./output.log",
         }
 
         fortigate = {
-            'device_type': 'fortinet',
-            'host': ip,
-            'username': user,
-            'password': password,
-            'port': port,
+            "device_type": "fortinet",
+            "host": ip,
+            "username": user,
+            "password": password,
+            "port": port,
         }
         if bastion_ip:
             self.net_connect = ConnectHandler(**bastion)
@@ -56,12 +67,18 @@ class FortigateSSH():
         self.net_connect.disconnect()
 
     def vdoms_enabled(self) -> bool:
-        self.net_connect.send_command('config global', expect_string=r"[#$]")
-        output = self.net_connect.send_command("get system status | grep Virtual", expect_string=r"[#$]")
-        return bool(re.search(r"Virtual domain configuration: (multiple|enable)", output))
+        self.net_connect.send_command("config global", expect_string=r"[#$]")
+        output = self.net_connect.send_command(
+            "get system status | grep Virtual", expect_string=r"[#$]"
+        )
+        return bool(
+            re.search(r"Virtual domain configuration: (multiple|enable)", output)
+        )
 
     def get_vdoms(self):
-        output = self.net_connect.send_command("get system vdom-property | grep name", expect_string=r"[#$]")
+        output = self.net_connect.send_command(
+            "get system vdom-property | grep name", expect_string=r"[#$]"
+        )
         return re.findall(r"name: (?P<vdom_name>\S+)", output)
 
     def get_policies(self):
@@ -71,11 +88,19 @@ class FortigateSSH():
             for vdom in self.vdom:
                 print(vdom)
                 self.net_connect.send_command(f"edit {vdom}", expect_string=r"[#$]")
-                output = self.net_connect.send_command("show firewall policy", expect_string=r"[#$]")
-                match_params = re.finditer(r"edit\D(?P<id>\d*)[\s\S]*?next\n", output, flags=re.M)
+                output = self.net_connect.send_command(
+                    "show firewall policy", expect_string=r"[#$]"
+                )
+                match_params = re.finditer(
+                    r"edit\D(?P<id>\d*)[\s\S]*?next\n", output, flags=re.M
+                )
                 for params in match_params:
                     # print(params.group('id'))
-                    matches = re.findall(r"set\D(?P<param>\S*)\s(?P<desc>.*)\n", params.group(), flags=re.M)
+                    matches = re.findall(
+                        r"set\D(?P<param>\S*)\s(?P<desc>.*)\n",
+                        params.group(),
+                        flags=re.M,
+                    )
                     # il faut ajouter l'ID dans le tuple matches
                     # id = ('id', params.group('id'))
                     print(type(matches))  # .append(tuple(('id', params.group('id'))))
@@ -83,7 +108,13 @@ class FortigateSSH():
                 self.net_connect.send_command("next", expect_string=r"[#$]")
             self.net_connect.send_command("end", expect_string=r"[#$]")
         else:
-            output = self.net_connect.send_command("show firewall policy", expect_string=r"[#$]")
-            match_params = re.finditer(r"edit\D(?P<id>\d*)[\s\S]*?next\n", output, flags=re.M)
+            output = self.net_connect.send_command(
+                "show firewall policy", expect_string=r"[#$]"
+            )
+            match_params = re.finditer(
+                r"edit\D(?P<id>\d*)[\s\S]*?next\n", output, flags=re.M
+            )
             for params in match_params:
-                matches = re.findall(r"set\D(?P<param>\S*)\s(?P<desc>.*)\n", params.group(), flags=re.M)
+                matches = re.findall(
+                    r"set\D(?P<param>\S*)\s(?P<desc>.*)\n", params.group(), flags=re.M
+                )
